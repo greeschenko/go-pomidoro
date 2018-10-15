@@ -39,6 +39,13 @@ func main() {
 	dir := usr.HomeDir
 	path := fmt.Sprintf("%s/gopomidoro.log", dir)
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0755)
+	defer f.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	path1 := fmt.Sprintf("%s/gopomidorostat.log", dir)
+	f1, err := os.OpenFile(path1, os.O_CREATE|os.O_RDWR, 0755)
+	defer f1.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,10 +58,11 @@ func main() {
 	reslist := strings.Split(string(b1), " ")
 	if len(reslist) > 1 {
 		if reset {
-			if _, err := f.WriteAt([]byte("0 done 0 "), 0); err != nil {
-				log.Fatal(err)
+			statisticstr := time.Now().Local().Format("2006-01-02") + " " + reslist[0] + " " + reslist[2]
+			if _, err = f1.WriteString(statisticstr); err != nil {
+				panic(err)
 			}
-			if err := f.Close(); err != nil {
+			if _, err := f.WriteAt([]byte("0 done 0 "), 0); err != nil {
 				log.Fatal(err)
 			}
 			return
@@ -80,9 +88,6 @@ func main() {
 	}
 
 	if rest && bc == 0 {
-		if err := f.Close(); err != nil {
-			log.Fatal(err)
-		}
 		panic("You dont have bonuses to rest, work more!")
 	}
 
@@ -125,9 +130,6 @@ func main() {
 			}
 			msg := fmt.Sprintf("%d done %d ", dc, bc)
 			if _, err := f.WriteAt([]byte(msg), 0); err != nil {
-				log.Fatal(err)
-			}
-			if err := f.Close(); err != nil {
 				log.Fatal(err)
 			}
 			return
