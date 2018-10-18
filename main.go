@@ -44,7 +44,7 @@ func main() {
 		log.Fatal(err)
 	}
 	path1 := fmt.Sprintf("%s/gopomidorostat.log", dir)
-	f1, err := os.OpenFile(path1, os.O_CREATE|os.O_RDWR, 0755)
+	f1, err := os.OpenFile(path1, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0755)
 	defer f1.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -58,7 +58,7 @@ func main() {
 	reslist := strings.Split(string(b1), " ")
 	if len(reslist) > 1 {
 		if reset {
-			statisticstr := time.Now().Local().Format("2006-01-02") + " " + reslist[0] + " " + reslist[2]
+			statisticstr := time.Now().Local().Format("2006-01-02") + " " + reslist[0] + " " + reslist[2] + "\n"
 			if _, err = f1.WriteString(statisticstr); err != nil {
 				panic(err)
 			}
